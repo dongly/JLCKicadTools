@@ -61,6 +61,15 @@ def GetOpts():
         default=[os.path.join(os.path.dirname(__file__), DEFAULT_DB_PATH)],
         action="append",
     )
+    parser.add_argument(
+        "-e",
+        "--exclude",
+        metavar="EXCLUDE_DIR",
+        type=str,
+        help="Exclude one or more subdirectories from searching for netlist / CPL files",
+        nargs='+',
+        default=[],
+    )
     verbosity = parser.add_argument_group("verbosity arguments")
     verbosity.add_argument(
         "-v",
@@ -130,6 +139,8 @@ def main():
     cpl_paths = []
 
     for dir_name, subdir_list, file_list in os.walk(opts.project_dir):
+        if any(exclude_dir in dir_name for exclude_dir in opts.exclude):
+            continue
         for file_name in file_list:
             if file_name == netlist_filename:
                 netlist_paths.append(os.path.join(dir_name, file_name))
